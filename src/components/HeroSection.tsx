@@ -38,7 +38,7 @@ export const HeroSection = () => {
           nossa reserva natural!
         </p>
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+        <div className="flex justify-center mb-12">
           <Button 
             size="lg" 
             className="bg-white text-primary hover:bg-white/90 px-8 py-4 text-lg font-semibold shadow-lg"
@@ -47,17 +47,6 @@ export const HeroSection = () => {
             <Gamepad2 className="w-6 h-6 mr-2" />
             Jogar Agora
           </Button>
-          
-          <div className="flex items-center text-white/90">
-            <div className="flex items-center mr-6">
-              <Star className="w-5 h-5 text-yellow-400 mr-1" />
-              <span className="font-semibold">3 Áreas</span>
-            </div>
-            <div className="flex items-center">
-              <Star className="w-5 h-5 text-yellow-400 mr-1" />
-              <span className="font-semibold">3 Estrelas</span>
-            </div>
-          </div>
         </div>
         
       </div>
