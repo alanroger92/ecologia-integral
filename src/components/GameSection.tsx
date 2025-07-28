@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Play, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Play, Users, ExternalLink } from "lucide-react";
 
 export const GameSection = () => {
   return (
@@ -40,6 +41,22 @@ export const GameSection = () => {
                 className="w-full max-w-4xl"
                 title="Faça a Diferença no Mundo - Jogo Interativo"
               />
+            </div>
+            <div className="p-6 text-center">
+              <Button 
+                asChild
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                <a 
+                  href="https://edu.delightex.com/JFQ-RGR" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center"
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Jogar em Tela Cheia
+                </a>
+              </Button>
             </div>
           </CardContent>
         </Card>
