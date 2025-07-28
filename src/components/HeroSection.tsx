@@ -60,12 +60,6 @@ export const HeroSection = () => {
           </div>
         </div>
         
-        
-        <div className="hidden md:block absolute bottom-20 right-10 animate-bounce" style={{ animationDelay: '1s' }}>
-          <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
-            <Star className="w-8 h-8 text-yellow-400" />
-          </div>
-        </div>
       </div>
     </section>
   );
