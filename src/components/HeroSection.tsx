@@ -60,12 +60,6 @@ export const HeroSection = () => {
           </div>
         </div>
         
-        {/* Floating elements */}
-        <div className="hidden md:block absolute top-20 left-10 animate-bounce">
-          <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
-            <Leaf className="w-8 h-8 text-white" />
-          </div>
-        </div>
         
         <div className="hidden md:block absolute bottom-20 right-10 animate-bounce" style={{ animationDelay: '1s' }}>
           <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
