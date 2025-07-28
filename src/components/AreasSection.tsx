@@ -13,7 +13,7 @@ export const AreasSection = () => {
       objectives: [
         "Limpar todo o lixo da superfície do lago",
         "Responder corretamente o quiz sobre água",
-        "Conquistar a estrela azul da água"
+        "Conquistar uma estrela de guarda florestal"
       ],
       image: lakeImage,
       className: "border-l-4 border-blue-400"
@@ -25,7 +25,7 @@ export const AreasSection = () => {
         "Recolher todo o lixo espalhado pelo chão",
         "Remover madeiras cortadas ilegalmente",
         "Responder o quiz sobre preservação terrestre",
-        "Conquistar a estrela marrom da terra"
+        "Conquistar uma estrela de guarda florestal"
       ],
       image: earthImage,
       className: "border-l-4 border-amber-600"
@@ -37,7 +37,7 @@ export const AreasSection = () => {
         "Apagar completamente o incêndio florestal",
         "Enterrar respeitosamente os pássaros vitimados",
         "Responder o quiz sobre qualidade do ar",
-        "Conquistar a estrela branca do ar"
+        "Conquistar uma estrela de guarda florestal"
       ],
       image: airImage,
       className: "border-l-4 border-sky-400"
@@ -78,20 +78,20 @@ export const AreasSection = () => {
           <div className="bg-gradient-to-r from-primary to-accent p-8 rounded-2xl text-white">
             <h3 className="text-2xl font-bold mb-4">🌟 Complete Todos os Desafios</h3>
             <p className="text-lg mb-4">
-              Colete as 3 estrelas (água, terra e ar) para completar sua missão 
+              Colete as 3 estrelas de guarda florestal para completar sua missão 
               e ajudar a natureza a prosperar novamente!
             </p>
             <div className="flex justify-center space-x-8 text-sm">
               <div className="flex items-center">
-                <span className="text-blue-300 mr-2">⭐</span>
+                <span className="text-yellow-400 mr-2">⭐</span>
                 <span>Estrela da Água</span>
               </div>
               <div className="flex items-center">
-                <span className="text-amber-300 mr-2">⭐</span>
+                <span className="text-yellow-400 mr-2">⭐</span>
                 <span>Estrela da Terra</span>
               </div>
               <div className="flex items-center">
-                <span className="text-white mr-2">⭐</span>
+                <span className="text-yellow-400 mr-2">⭐</span>
                 <span>Estrela do Ar</span>
               </div>
             </div>
