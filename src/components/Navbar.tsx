@@ -52,6 +52,14 @@ export const Navbar = () => {
                   Jogo
                 </NavigationMenuLink>
               </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  className="cursor-pointer text-muted-foreground hover:text-primary transition-colors font-medium"
+                  onClick={() => scrollToSection("review-section")}
+                >
+                  Avaliar
+                </NavigationMenuLink>
+              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
         </div>
