@@ -37,8 +37,15 @@ export const Footer = () => {
               </Badge>
               <h4 className="text-xl font-semibold mb-2">Instrutor Alan Róger</h4>
               <p className="opacity-80">
-                Educador especializado em tecnologia e 
-                sustentabilidade ambiental.
+                Instrutor da SuperGeeks Canoas e Embaixador da{" "}
+                <a 
+                  href="https://www.delightex.com/ambassadors" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="underline hover:text-white transition-colors"
+                >
+                  Delightex
+                </a>.
               </p>
             </div>
           </div>
@@ -46,7 +53,7 @@ export const Footer = () => {
 
         <div className="border-t border-primary-foreground/20 mt-8 pt-6 text-center">
           <p className="text-sm opacity-70">
-            © 2024 Escola SuperGeeks Canoas. Projeto desenvolvido com 💚 para um mundo mais sustentável.
+            © 2025 Escola SuperGeeks Canoas. Projeto desenvolvido com 💚 para um mundo mais sustentável.
           </p>
         </div>
       </div>
