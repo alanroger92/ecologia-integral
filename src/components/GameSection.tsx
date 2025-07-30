@@ -16,8 +16,7 @@ export const GameSection = () => {
             Entre na Aventura
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Seu carro quebrou perto de uma reserva natural. O guarda florestal Jorge 
-            oferece ajuda, mas precisa da sua colaboração para preservar o ambiente!
+            Está pronto para fazer a diferença? Clique no jogo abaixo e comece sua jornada ecológica!
           </p>
         </div>
 
