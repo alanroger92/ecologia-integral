@@ -39,6 +39,14 @@ export const Navbar = () => {
               <NavigationMenuItem>
                 <NavigationMenuLink
                   className="cursor-pointer text-muted-foreground hover:text-primary transition-colors font-medium"
+                  onClick={() => scrollToSection("story-section")}
+                >
+                  História
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink
+                  className="cursor-pointer text-muted-foreground hover:text-primary transition-colors font-medium"
                   onClick={() => scrollToSection("areas-section")}
                 >
                   Áreas
