@@ -23,7 +23,23 @@ export const Footer = () => {
                 <Users className="w-4 h-4 mr-2" />
                 Apoio Institucional
               </Badge>
-              <h4 className="text-xl font-semibold mb-2">Escola SuperGeeks Canoas</h4>
+              <div className="flex items-center gap-4 justify-center md:justify-start mb-4">
+                <a 
+                  href="https://canoas.supergeeks.com.br/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:opacity-80 transition-opacity"
+                >
+                  <img 
+                    src="/lovable-uploads/1e9a4f13-0b31-4ae7-a4f6-c58f11129b71.png" 
+                    alt="SuperGeeks Logo" 
+                    className="w-16 h-16"
+                  />
+                </a>
+                <div>
+                  <h4 className="text-xl font-semibold mb-2">Escola SuperGeeks Canoas</h4>
+                </div>
+              </div>
               <p className="opacity-80">
                 Instituição de ensino comprometida com a educação inovadora 
                 e o desenvolvimento sustentável.
