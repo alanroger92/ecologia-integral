@@ -23,7 +23,7 @@ export const Footer = () => {
                 <Users className="w-4 h-4 mr-2" />
                 Apoio Institucional
               </Badge>
-              <div className="flex items-center gap-4 justify-center md:justify-start mb-4">
+              <div className="flex items-center gap-4 justify-center md:justify-start">
                 <a 
                   href="https://canoas.supergeeks.com.br/" 
                   target="_blank" 
@@ -38,12 +38,12 @@ export const Footer = () => {
                 </a>
                 <div>
                   <h4 className="text-xl font-semibold mb-2">Escola SuperGeeks Canoas</h4>
+                  <p className="opacity-80">
+                    Instituição de ensino comprometida com a educação inovadora 
+                    e o desenvolvimento sustentável.
+                  </p>
                 </div>
               </div>
-              <p className="opacity-80">
-                Instituição de ensino comprometida com a educação inovadora 
-                e o desenvolvimento sustentável.
-              </p>
             </div>
 
             <div className="text-center md:text-right">
