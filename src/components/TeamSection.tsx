@@ -29,7 +29,7 @@ export const TeamSection = () => {
           <div className="flex items-center justify-center gap-4 mb-6">
             <div className="text-center">
               <p className="text-lg font-medium text-foreground">9º Ano A</p>
-              <img src="/lovable-uploads/d9d60697-46f5-45ab-988a-0e0ee25eac43.png" alt="Escola Fátima Logo" className="h-8 mx-auto" />
+              <img src="/lovable-uploads/d9d60697-46f5-45ab-988a-0e0ee25eac43.png" alt="Escola Fátima Logo" className="mx-auto" />
             </div>
           </div>
         </div>
