@@ -27,11 +27,11 @@ const Index = () => {
       <div id="game-section">
         <GameSection />
       </div>
-      <div id="team-section">
-        <TeamSection />
-      </div>
       <div id="review-section">
         <ReviewSection />
+      </div>
+      <div id="team-section">
+        <TeamSection />
       </div>
       <Footer />
     </div>

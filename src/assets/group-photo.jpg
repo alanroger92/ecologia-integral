@@ -1,0 +1,2 @@
+// Placeholder for group photo - will be replaced with actual image
+export default "/placeholder.svg";

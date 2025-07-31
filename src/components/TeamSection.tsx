@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// Logo da escola será adicionada quando disponível
+import escolaLogo from "@/assets/escola-fatima-logo.png";
 
 const teamMembers = [
   "Andriy Shevchenko Lacerda da Silva",
@@ -18,16 +18,17 @@ export const TeamSection = () => {
   };
 
   return (
-    <section className="py-24 px-4 bg-gradient-to-b from-background to-secondary/5">
+    <section className="py-24 px-4 bg-background">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-16">
           <Badge variant="secondary" className="mb-4">
             Nosso Grupo
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
             Integrantes do Projeto
           </h2>
-          <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <img src={escolaLogo} alt="Escola Fátima Logo" className="w-12 h-12" />
             <div className="text-center">
               <p className="text-lg font-medium text-foreground">9º Ano A</p>
               <p className="text-sm text-muted-foreground">Escola Fátima</p>
@@ -40,17 +41,15 @@ export const TeamSection = () => {
             <Card key={index} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
               <CardContent className="p-6 text-center">
                 <Avatar className="w-24 h-24 mx-auto mb-4">
-                  <AvatarImage src={`https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=200&h=200&fit=crop&crop=face`} />
+                  <AvatarImage src="/placeholder.svg" />
                   <AvatarFallback className="text-lg font-semibold bg-primary/10 text-primary">
                     {getInitials(member)}
                   </AvatarFallback>
                 </Avatar>
-                <h3 className="font-semibold text-lg text-foreground mb-2">
-                  {member}
+                <h3 className="font-semibold text-base text-foreground leading-tight">
+                  {member.split(' ').slice(0, 2).join(' ')}<br />
+                  {member.split(' ').slice(2).join(' ')}
                 </h3>
-                <Badge variant="outline" className="text-xs">
-                  Integrante
-                </Badge>
               </CardContent>
             </Card>
           ))}
