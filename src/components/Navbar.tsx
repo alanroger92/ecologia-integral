@@ -63,17 +63,17 @@ export const Navbar = () => {
               <NavigationMenuItem>
                 <NavigationMenuLink
                   className="cursor-pointer text-muted-foreground hover:text-primary transition-colors font-medium"
-                  onClick={() => scrollToSection("team-section")}
+                  onClick={() => scrollToSection("review-section")}
                 >
-                  Grupo
+                  Avaliar
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuLink
                   className="cursor-pointer text-muted-foreground hover:text-primary transition-colors font-medium"
-                  onClick={() => scrollToSection("review-section")}
+                  onClick={() => scrollToSection("team-section")}
                 >
-                  Avaliar
+                  Grupo
                 </NavigationMenuLink>
               </NavigationMenuItem>
             </NavigationMenuList>

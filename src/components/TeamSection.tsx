@@ -17,13 +17,13 @@ export const TeamSection = () => {
   };
 
   return (
-    <section className="py-24 px-4 bg-background">
-      <div className="container mx-auto max-w-6xl">
+    <section className="py-20 px-6 bg-muted/30">
+      <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4">
+          <Badge className="mb-4 bg-accent text-accent-foreground">
             Nosso Grupo
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
+          <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
             Integrantes do Projeto
           </h2>
           <div className="flex items-center justify-center gap-4 mb-6">
@@ -36,7 +36,7 @@ export const TeamSection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {teamMembers.map((member, index) => (
-            <Card key={index} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            <Card key={index} className="text-center hover:shadow-nature transition-all duration-300 hover:-translate-y-1">
               <CardContent className="p-6 text-center">
                 <Avatar className="w-24 h-24 mx-auto mb-4">
                   <AvatarImage src="/placeholder.svg" />
