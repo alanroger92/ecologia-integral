@@ -39,7 +39,7 @@ export const TeamSection = () => {
             <Card key={index} className="text-center hover:shadow-nature transition-all duration-300 hover:-translate-y-1">
               <CardContent className="p-6 text-center">
                 <Avatar className="w-24 h-24 mx-auto mb-4">
-                  <AvatarImage src="/placeholder.svg" />
+                  <AvatarImage src="/lovable-uploads/a5a359d6-6d15-4136-b95c-c61425f9d28e.png" />
                   <AvatarFallback className="text-lg font-semibold bg-primary/10 text-primary">
                     {getInitials(member)}
                   </AvatarFallback>
