@@ -1,7 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import escolaLogo from "@/assets/escola-fatima-logo.png";
 
 const teamMembers = [
   "Andriy Shevchenko Lacerda da Silva",
@@ -28,7 +27,6 @@ export const TeamSection = () => {
             Integrantes do Projeto
           </h2>
           <div className="flex items-center justify-center gap-4 mb-6">
-            <img src={escolaLogo} alt="Escola Fátima Logo" className="w-12 h-12" />
             <div className="text-center">
               <p className="text-lg font-medium text-foreground">9º Ano A</p>
               <p className="text-sm text-muted-foreground">Escola Fátima</p>
