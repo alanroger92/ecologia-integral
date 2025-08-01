@@ -75,11 +75,10 @@ export const AreasSection = () => {
         </div>
 
         <div className="mt-16 text-center">
-          <div className="bg-gradient-to-r from-primary to-accent p-8 rounded-2xl text-white">
-            <h3 className="text-2xl font-bold mb-4">🌟 Complete Todos os Desafios</h3>
+          <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-8 rounded-2xl text-white">
+            <h3 className="text-2xl font-bold mb-4">🏆 Colete as 3 Estrelas</h3>
             <p className="text-lg mb-4">
-              Colete as 3 estrelas de guarda florestal para completar sua missão 
-              e ajudar a natureza a prosperar novamente!
+              Complete todos os desafios, responda aos quizzes corretamente e ajude a natureza a se recuperar. Só assim você conseguirá partir com a consciência tranquila!
             </p>
             <div className="flex justify-center space-x-8 text-sm">
               <div className="flex items-center">
