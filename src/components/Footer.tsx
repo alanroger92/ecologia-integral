@@ -51,18 +51,34 @@ export const Footer = () => {
                 <User className="w-4 h-4 mr-2" />
                 Desenvolvimento
               </Badge>
-              <h4 className="text-xl font-semibold mb-2">Instrutor Alan Róger</h4>
-              <p className="opacity-80">
-                Instrutor da SuperGeeks Canoas e Embaixador da{" "}
+              <div className="flex items-center gap-4 justify-center md:justify-end">
+                <div className="text-center md:text-right">
+                  <h4 className="text-xl font-semibold mb-2">Instrutor Alan Róger</h4>
+                  <p className="opacity-80">
+                    Instrutor da SuperGeeks Canoas e Embaixador da{" "}
+                    <a 
+                      href="https://www.delightex.com/ambassadors" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="underline hover:text-white transition-colors"
+                    >
+                      Delightex
+                    </a>.
+                  </p>
+                </div>
                 <a 
-                  href="https://www.delightex.com/ambassadors" 
+                  href="https://www.delightex.com/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="underline hover:text-white transition-colors"
+                  className="hover:opacity-80 transition-opacity"
                 >
-                  Delightex
-                </a>.
-              </p>
+                  <img 
+                    src="/lovable-uploads/70ef8903-4f7a-42fe-9585-da340a068f18.png" 
+                    alt="Delightex Logo" 
+                    className="h-20 w-20 object-contain"
+                  />
+                </a>
+              </div>
             </div>
           </div>
         </div>
