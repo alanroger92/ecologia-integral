@@ -33,7 +33,7 @@ export const Footer = () => {
                   <img 
                     src="/lovable-uploads/10b215c5-fe99-43e6-9056-a4d6dc915a13.png" 
                     alt="SuperGeeks Logo" 
-                    className="h-16 w-auto"
+                    className="h-20 w-20 object-contain"
                   />
                 </a>
                 <div>
