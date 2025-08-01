@@ -31,9 +31,9 @@ export const Footer = () => {
                   className="hover:opacity-80 transition-opacity"
                 >
                   <img 
-                    src="/lovable-uploads/1e9a4f13-0b31-4ae7-a4f6-c58f11129b71.png" 
+                    src="/lovable-uploads/10b215c5-fe99-43e6-9056-a4d6dc915a13.png" 
                     alt="SuperGeeks Logo" 
-                    className="w-16 h-16"
+                    className="h-16 w-auto"
                   />
                 </a>
                 <div>
