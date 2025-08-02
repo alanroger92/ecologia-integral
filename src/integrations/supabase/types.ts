@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      gallery: {
+        Row: {
+          caption: string | null
+          created_at: string
+          file_name: string
+          file_type: string
+          file_url: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          file_name: string
+          file_type: string
+          file_url: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          file_name?: string
+          file_type?: string
+          file_url?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           age: number

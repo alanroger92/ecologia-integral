@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Star, Check, X, Loader2, Edit, Trash2, LogOut } from "lucide-react";
+import { Star, Check, X, Loader2, Edit, Trash2, LogOut, Upload, Image, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -19,12 +19,24 @@ interface Review {
   rejected: boolean;
 }
 
+interface GalleryItem {
+  id: string;
+  file_name: string;
+  file_url: string;
+  file_type: string;
+  caption: string | null;
+  created_at: string;
+}
+
 const Admin = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [editComment, setEditComment] = useState("");
+  const [uploadCaption, setUploadCaption] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -36,6 +48,7 @@ const Admin = () => {
       return;
     }
     fetchAllReviews();
+    fetchGalleryItems();
   }, [navigate]);
 
   const handleLogout = () => {
@@ -61,6 +74,143 @@ const Admin = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchGalleryItems = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('gallery')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setGalleryItems(data || []);
+    } catch (error) {
+      console.error('Error fetching gallery items:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível carregar a galeria",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Verificar tipo de arquivo
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'video/mp4', 'video/webm'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: "Erro",
+        description: "Tipo de arquivo não suportado. Use JPG, PNG, WEBP, MP4 ou WEBM.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Verificar tamanho (50MB máximo)
+    if (file.size > 50 * 1024 * 1024) {
+      toast({
+        title: "Erro",
+        description: "Arquivo muito grande. Máximo 50MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = fileName;
+
+      // Upload do arquivo para o storage
+      const { error: uploadError } = await supabase.storage
+        .from('gallery')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      // Obter URL pública
+      const { data: { publicUrl } } = supabase.storage
+        .from('gallery')
+        .getPublicUrl(filePath);
+
+      // Salvar na tabela gallery
+      const fileType = file.type.startsWith('image/') ? 'image' : 'video';
+      const { error: dbError } = await supabase
+        .from('gallery')
+        .insert({
+          file_name: file.name,
+          file_url: publicUrl,
+          file_type: fileType,
+          caption: uploadCaption.trim() || null
+        });
+
+      if (dbError) throw dbError;
+
+      toast({
+        title: "Sucesso",
+        description: `${fileType === 'image' ? 'Imagem' : 'Vídeo'} enviado com sucesso!`,
+      });
+
+      setUploadCaption("");
+      fetchGalleryItems();
+      
+      // Limpar input
+      event.target.value = "";
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível enviar o arquivo",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const deleteGalleryItem = async (item: GalleryItem) => {
+    if (!confirm("Tem certeza que deseja apagar este item da galeria?")) return;
+
+    setUpdating(item.id);
+    try {
+      // Extrair o nome do arquivo da URL
+      const fileName = item.file_url.split('/').pop();
+      
+      // Deletar do storage
+      if (fileName) {
+        await supabase.storage
+          .from('gallery')
+          .remove([fileName]);
+      }
+
+      // Deletar do banco
+      const { error } = await supabase
+        .from('gallery')
+        .delete()
+        .eq('id', item.id);
+
+      if (error) throw error;
+
+      setGalleryItems(galleryItems.filter(galleryItem => galleryItem.id !== item.id));
+      toast({
+        title: "Sucesso",
+        description: "Item removido da galeria com sucesso",
+      });
+    } catch (error) {
+      console.error('Error deleting gallery item:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível remover o item da galeria",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdating(null);
     }
   };
 
@@ -267,6 +417,130 @@ const Admin = () => {
             </Card>
           </div>
         )}
+
+        {/* Gerenciamento da Galeria */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold mb-6 text-foreground">
+            Galeria do Projeto ({galleryItems.length})
+          </h2>
+          
+          {/* Upload de Nova Mídia */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="w-5 h-5" />
+                Adicionar Foto ou Vídeo
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Legenda (opcional)
+                </label>
+                <Input
+                  value={uploadCaption}
+                  onChange={(e) => setUploadCaption(e.target.value)}
+                  placeholder="Digite uma legenda para a mídia..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Arquivo
+                </label>
+                <Input
+                  type="file"
+                  accept="image/*,video/*"
+                  onChange={handleFileUpload}
+                  disabled={uploading}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Formatos suportados: JPG, PNG, WEBP, MP4, WEBM (máx. 50MB)
+                </p>
+              </div>
+              {uploading && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Enviando arquivo...
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Lista de Itens da Galeria */}
+          {galleryItems.length === 0 ? (
+            <Card>
+              <CardContent className="p-6 text-center text-muted-foreground">
+                Nenhuma foto ou vídeo na galeria ainda
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {galleryItems.map((item) => (
+                <Card key={item.id} className="overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="aspect-video bg-black flex items-center justify-center relative">
+                      {item.file_type === 'image' ? (
+                        <img
+                          src={item.file_url}
+                          alt={item.caption || item.file_name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <>
+                          <video
+                            src={item.file_url}
+                            className="w-full h-full object-cover"
+                            controls={false}
+                          />
+                          <Video className="absolute w-8 h-8 text-white" />
+                        </>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          {item.file_type === 'image' ? (
+                            <Image className="w-4 h-4 text-muted-foreground" />
+                          ) : (
+                            <Video className="w-4 h-4 text-muted-foreground" />
+                          )}
+                          <span className="text-sm font-medium">
+                            {item.file_type === 'image' ? 'Imagem' : 'Vídeo'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {item.caption && (
+                        <p className="text-sm text-foreground mb-2">
+                          {item.caption}
+                        </p>
+                      )}
+                      
+                      <p className="text-xs text-muted-foreground mb-3">
+                        {formatDate(item.created_at)}
+                      </p>
+                      
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => deleteGalleryItem(item)}
+                        disabled={updating === item.id}
+                        className="w-full"
+                      >
+                        {updating === item.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                        Remover
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Avaliações Pendentes */}
         <div className="mb-12">
