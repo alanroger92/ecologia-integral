@@ -18,8 +18,6 @@ const GallerySection = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  
-  const itemsPerPage = 6;
 
   useEffect(() => {
     fetchGalleryItems();
@@ -41,14 +39,14 @@ const GallerySection = () => {
     }
   };
 
-  const maxIndex = Math.max(0, galleryItems.length - itemsPerPage);
+  const maxIndex = Math.max(0, galleryItems.length - 1);
   
-  const nextPage = () => {
-    setCarouselIndex((prev) => Math.min(prev + itemsPerPage, maxIndex));
+  const nextItem = () => {
+    setCarouselIndex((prev) => Math.min(prev + 1, maxIndex));
   };
 
-  const prevPage = () => {
-    setCarouselIndex((prev) => Math.max(prev - itemsPerPage, 0));
+  const prevItem = () => {
+    setCarouselIndex((prev) => Math.max(prev - 1, 0));
   };
 
   if (loading) {
@@ -85,9 +83,8 @@ const GallerySection = () => {
     );
   }
 
-  const visibleItems = galleryItems.slice(carouselIndex, carouselIndex + itemsPerPage);
   const canScrollPrev = carouselIndex > 0;
-  const canScrollNext = carouselIndex < maxIndex;
+  const canScrollNext = carouselIndex < galleryItems.length - 1;
 
   return (
     <section className="py-20 bg-muted/50">
@@ -105,7 +102,7 @@ const GallerySection = () => {
                 variant="outline"
                 size="icon"
                 className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm"
-                onClick={prevPage}
+                onClick={prevItem}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -117,14 +114,19 @@ const GallerySection = () => {
                 variant="outline"
                 size="icon"
                 className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm"
-                onClick={nextPage}
+                onClick={nextItem}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
             )}
             
-            <div className="flex gap-4 overflow-hidden px-12">
-              {visibleItems.map((item) => (
+            <div 
+              className="flex gap-4 transition-transform duration-300 ease-in-out px-12"
+              style={{ 
+                transform: `translateX(-${carouselIndex * (128 + 16)}px)` // 128px width + 16px gap
+              }}
+            >
+              {galleryItems.map((item) => (
                 <Dialog key={item.id}>
                   <DialogTrigger asChild>
                     <Card className="flex-shrink-0 w-32 h-32 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
