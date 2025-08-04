@@ -39,6 +39,7 @@ const GallerySection = () => {
     }
   };
 
+  
   const maxIndex = Math.max(0, galleryItems.length - 1);
   
   const nextItem = () => {
