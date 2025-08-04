@@ -18,6 +18,7 @@ const GallerySection = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
 
   useEffect(() => {
     fetchGalleryItems();
@@ -49,6 +50,37 @@ const GallerySection = () => {
   const prevItem = () => {
     setCarouselIndex((prev) => Math.max(prev - 1, 0));
   };
+
+  // Funções para navegação no modal
+  const nextModalItem = () => {
+    if (selectedItemIndex !== null && selectedItemIndex < galleryItems.length - 1) {
+      setSelectedItemIndex(selectedItemIndex + 1);
+    }
+  };
+
+  const prevModalItem = () => {
+    if (selectedItemIndex !== null && selectedItemIndex > 0) {
+      setSelectedItemIndex(selectedItemIndex - 1);
+    }
+  };
+
+  // Event listener para teclas do teclado
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (selectedItemIndex !== null) {
+        if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          nextModalItem();
+        } else if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          prevModalItem();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [selectedItemIndex, galleryItems.length]);
 
   if (loading) {
     return (
@@ -127,8 +159,14 @@ const GallerySection = () => {
                 transform: `translateX(-${carouselIndex * (128 + 16)}px)` // 128px width + 16px gap
               }}
             >
-              {galleryItems.map((item) => (
-                <Dialog key={item.id}>
+              {galleryItems.map((item, index) => (
+                <Dialog key={item.id} open={selectedItemIndex === index} onOpenChange={(open) => {
+                  if (open) {
+                    setSelectedItemIndex(index);
+                  } else {
+                    setSelectedItemIndex(null);
+                  }
+                }}>
                   <DialogTrigger asChild>
                     <Card className="flex-shrink-0 w-32 h-32 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
                       <CardContent className="p-0 h-full">
@@ -157,28 +195,56 @@ const GallerySection = () => {
                   </DialogTrigger>
                   <DialogContent className="max-w-[95vw] max-h-[95vh] w-auto h-auto p-2">
                     <div className="relative w-full h-full flex items-center justify-center">
-                      {item.file_type === 'image' ? (
-                        <img
-                          src={item.file_url}
-                          alt={item.caption || item.file_name}
-                          className="max-w-full max-h-full object-contain"
-                          style={{ maxHeight: '90vh', maxWidth: '90vw' }}
-                        />
-                      ) : (
-                        <video
-                          src={item.file_url}
-                          controls
-                          className="max-w-full max-h-full object-contain"
-                          style={{ maxHeight: '90vh', maxWidth: '90vw' }}
-                          autoPlay
+                      {/* Botão Anterior no Modal */}
+                      {selectedItemIndex !== null && selectedItemIndex > 0 && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-sm"
+                          onClick={prevModalItem}
                         >
-                          Seu navegador não suporta vídeos HTML5.
-                        </video>
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
                       )}
-                      {item.caption && (
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/80 text-white p-4">
-                          <p className="text-center text-sm">{item.caption}</p>
-                        </div>
+                      
+                      {/* Botão Próximo no Modal */}
+                      {selectedItemIndex !== null && selectedItemIndex < galleryItems.length - 1 && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-sm"
+                          onClick={nextModalItem}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      )}
+                      
+                      {selectedItemIndex !== null && galleryItems[selectedItemIndex] && (
+                        <>
+                          {galleryItems[selectedItemIndex].file_type === 'image' ? (
+                            <img
+                              src={galleryItems[selectedItemIndex].file_url}
+                              alt={galleryItems[selectedItemIndex].caption || galleryItems[selectedItemIndex].file_name}
+                              className="max-w-full max-h-full object-contain"
+                              style={{ maxHeight: '90vh', maxWidth: '90vw' }}
+                            />
+                          ) : (
+                            <video
+                              src={galleryItems[selectedItemIndex].file_url}
+                              controls
+                              className="max-w-full max-h-full object-contain"
+                              style={{ maxHeight: '90vh', maxWidth: '90vw' }}
+                              autoPlay
+                            >
+                              Seu navegador não suporta vídeos HTML5.
+                            </video>
+                          )}
+                          {galleryItems[selectedItemIndex].caption && (
+                            <div className="absolute bottom-0 left-0 right-0 bg-black/80 text-white p-4">
+                              <p className="text-center text-sm">{galleryItems[selectedItemIndex].caption}</p>
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
                   </DialogContent>
