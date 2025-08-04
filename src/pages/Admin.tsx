@@ -360,7 +360,7 @@ const Admin = () => {
               Painel Administrativo
             </h1>
             <p className="text-muted-foreground">
-              Gerencie as avaliações dos jogadores
+              Gerencie as avaliações dos jogadores e a galeria do projeto
             </p>
           </div>
           <Button onClick={handleLogout} variant="outline">

@@ -28,6 +28,7 @@ export const Navbar = () => {
     { id: "game-section", label: "Jogo" },
     { id: "review-section", label: "Avaliar" },
     { id: "team-section", label: "Grupo" },
+    { id: "gallery-section", label: "Galeria" },
   ];
 
   return (

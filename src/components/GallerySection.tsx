@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 interface GalleryItem {
   id: string;
@@ -17,6 +18,7 @@ const GallerySection = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
 
   useEffect(() => {
     fetchGalleryItems();
@@ -94,100 +96,64 @@ const GallerySection = () => {
         </h2>
         
         <div className="relative max-w-6xl mx-auto">
-          {/* Carrossel Principal */}
-          <Card className="overflow-hidden">
-            <CardContent className="p-0 relative">
-              <div className="aspect-video bg-black flex items-center justify-center">
-                {currentItem.file_type === 'image' ? (
-                  <img
-                    src={currentItem.file_url}
-                    alt={currentItem.caption || currentItem.file_name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="relative w-full h-full">
-                    <video
-                      src={currentItem.file_url}
-                      controls
-                      className="w-full h-full object-cover"
-                      poster={currentItem.file_url}
-                    >
-                      Seu navegador não suporta vídeos HTML5.
-                    </video>
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <Play className="w-16 h-16 text-white opacity-80" />
-                    </div>
+          {/* Grid de Miniaturas */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {galleryItems.map((item) => (
+              <Dialog key={item.id}>
+                <DialogTrigger asChild>
+                  <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow aspect-square">
+                    <CardContent className="p-0 h-full">
+                      <div className="relative w-full h-full bg-black flex items-center justify-center">
+                        {item.file_type === 'image' ? (
+                          <img
+                            src={item.file_url}
+                            alt={item.caption || item.file_name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full relative">
+                            <video 
+                              src={item.file_url} 
+                              className="w-full h-full object-cover"
+                              muted
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                              <Play className="w-8 h-8 text-white" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl w-full h-[80vh] p-0">
+                  <div className="relative w-full h-full bg-black flex items-center justify-center">
+                    {item.file_type === 'image' ? (
+                      <img
+                        src={item.file_url}
+                        alt={item.caption || item.file_name}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    ) : (
+                      <video
+                        src={item.file_url}
+                        controls
+                        className="max-w-full max-h-full object-contain"
+                        autoPlay
+                      >
+                        Seu navegador não suporta vídeos HTML5.
+                      </video>
+                    )}
+                    {item.caption && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/80 text-white p-4">
+                        <p className="text-center text-sm">{item.caption}</p>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              
-              {/* Controles de Navegação */}
-              {galleryItems.length > 1 && (
-                <>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-background/80 hover:bg-background"
-                    onClick={prevSlide}
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-background/80 hover:bg-background"
-                    onClick={nextSlide}
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </>
-              )}
-              
-              {/* Legenda */}
-              {currentItem.caption && (
-                <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-4">
-                  <p className="text-center">{currentItem.caption}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Indicadores/Miniaturas */}
-          {galleryItems.length > 1 && (
-            <div className="flex justify-center mt-6 gap-2 overflow-x-auto pb-2">
-              {galleryItems.map((item, index) => (
-                <button
-                  key={item.id}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                    index === currentIndex 
-                      ? 'border-primary shadow-lg' 
-                      : 'border-transparent hover:border-muted-foreground'
-                  }`}
-                >
-                  {item.file_type === 'image' ? (
-                    <img
-                      src={item.file_url}
-                      alt={item.caption || item.file_name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-black flex items-center justify-center relative">
-                      <video src={item.file_url} className="w-full h-full object-cover" />
-                      <Play className="absolute w-6 h-6 text-white" />
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Contador */}
-          {galleryItems.length > 1 && (
-            <div className="text-center mt-4 text-muted-foreground">
-              {currentIndex + 1} de {galleryItems.length}
-            </div>
-          )}
+                </DialogContent>
+              </Dialog>
+            ))}
+          </div>
         </div>
       </div>
     </section>
