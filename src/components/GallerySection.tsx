@@ -208,7 +208,7 @@ const GallerySection = () => {
                         <Button
                           variant="outline"
                           size="icon"
-                          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-sm"
+                          className="absolute -left-16 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-sm hidden sm:flex"
                           onClick={prevModalItem}
                         >
                           <ChevronLeft className="h-4 w-4" />
@@ -220,7 +220,7 @@ const GallerySection = () => {
                         <Button
                           variant="outline"
                           size="icon"
-                          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-sm"
+                          className="absolute -right-16 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-sm hidden sm:flex"
                           onClick={nextModalItem}
                         >
                           <ChevronRight className="h-4 w-4" />
