@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Link } from "react-router-dom";
 
 interface GalleryItem {
   id: string;
@@ -277,6 +278,15 @@ const GallerySection = () => {
             <p className="text-muted-foreground">
               {carouselIndex + 1} - {Math.min(carouselIndex + itemsPerPage, galleryItems.length)} de {galleryItems.length} {galleryItems.length === 1 ? 'item' : 'itens'}
             </p>
+          </div>
+          
+          {/* Botão para ver galeria completa */}
+          <div className="text-center mt-6">
+            <Link to="/galeria">
+              <Button variant="outline" className="px-6">
+                Ver Galeria Completa
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
