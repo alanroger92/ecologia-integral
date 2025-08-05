@@ -126,9 +126,16 @@ const GallerySection = () => {
   return (
     <section className="py-20 bg-muted/50">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center mb-12 text-primary">
+        <h2 className="text-4xl font-bold text-center mb-8 text-primary">
           Galeria do Projeto
         </h2>
+        
+        {/* Contador */}
+        <div className="text-center mb-8">
+          <p className="text-muted-foreground">
+            {carouselIndex + 1} - {Math.min(carouselIndex + itemsPerPage, galleryItems.length)} de {galleryItems.length} {galleryItems.length === 1 ? 'item' : 'itens'}
+          </p>
+        </div>
         
         <div className="relative max-w-4xl mx-auto">
           {/* Carrossel Horizontal */}
