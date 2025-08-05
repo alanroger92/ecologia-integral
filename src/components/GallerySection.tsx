@@ -19,9 +19,28 @@ const GallerySection = () => {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
+  const [itemsPerPage, setItemsPerPage] = useState(3);
 
   useEffect(() => {
     fetchGalleryItems();
+  }, []);
+
+  // Hook para responsividade
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 640) {
+        setItemsPerPage(1); // Mobile
+      } else if (width < 1024) {
+        setItemsPerPage(2); // Tablet
+      } else {
+        setItemsPerPage(3); // Desktop
+      }
+    };
+
+    handleResize(); // Executar na primeira vez
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const fetchGalleryItems = async () => {
@@ -40,8 +59,6 @@ const GallerySection = () => {
     }
   };
 
-  
-  const itemsPerPage = 3;
   const maxIndex = Math.max(0, galleryItems.length - itemsPerPage);
   
   const nextItem = () => {
@@ -126,16 +143,9 @@ const GallerySection = () => {
   return (
     <section className="py-20 bg-muted/50">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center mb-8 text-primary">
+        <h2 className="text-4xl font-bold text-center mb-12 text-primary">
           Galeria do Projeto
         </h2>
-        
-        {/* Contador */}
-        <div className="text-center mb-8">
-          <p className="text-muted-foreground">
-            {carouselIndex + 1} - {Math.min(carouselIndex + itemsPerPage, galleryItems.length)} de {galleryItems.length} {galleryItems.length === 1 ? 'item' : 'itens'}
-          </p>
-        </div>
         
         <div className="relative max-w-4xl mx-auto">
           {/* Carrossel Horizontal */}
@@ -260,6 +270,13 @@ const GallerySection = () => {
                 );
               })}
             </div>
+          </div>
+          
+          {/* Contador embaixo */}
+          <div className="text-center mt-8">
+            <p className="text-muted-foreground">
+              {carouselIndex + 1} - {Math.min(carouselIndex + itemsPerPage, galleryItems.length)} de {galleryItems.length} {galleryItems.length === 1 ? 'item' : 'itens'}
+            </p>
           </div>
         </div>
       </div>
