@@ -41,14 +41,15 @@ const GallerySection = () => {
   };
 
   
-  const maxIndex = Math.max(0, galleryItems.length - 1);
+  const itemsPerPage = 3;
+  const maxIndex = Math.max(0, galleryItems.length - itemsPerPage);
   
   const nextItem = () => {
-    setCarouselIndex((prev) => Math.min(prev + 1, maxIndex));
+    setCarouselIndex((prev) => Math.min(prev + itemsPerPage, maxIndex));
   };
 
   const prevItem = () => {
-    setCarouselIndex((prev) => Math.max(prev - 1, 0));
+    setCarouselIndex((prev) => Math.max(prev - itemsPerPage, 0));
   };
 
   // Funções para navegação no modal
@@ -117,7 +118,10 @@ const GallerySection = () => {
   }
 
   const canScrollPrev = carouselIndex > 0;
-  const canScrollNext = carouselIndex < galleryItems.length - 1;
+  const canScrollNext = carouselIndex < maxIndex;
+
+  // Calcular quais itens mostrar
+  const visibleItems = galleryItems.slice(carouselIndex, carouselIndex + itemsPerPage);
 
   return (
     <section className="py-20 bg-muted/50">
@@ -126,7 +130,7 @@ const GallerySection = () => {
           Galeria do Projeto
         </h2>
         
-        <div className="relative max-w-6xl mx-auto">
+        <div className="relative max-w-4xl mx-auto">
           {/* Carrossel Horizontal */}
           <div className="relative">
             {/* Botão Anterior */}
@@ -134,7 +138,7 @@ const GallerySection = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm"
+                className="absolute left-2 sm:left-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm"
                 onClick={prevItem}
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -146,29 +150,26 @@ const GallerySection = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm"
+                className="absolute right-2 sm:right-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm"
                 onClick={nextItem}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
             )}
             
-            <div 
-              className="flex gap-4 transition-transform duration-300 ease-in-out px-12"
-              style={{ 
-                transform: `translateX(-${carouselIndex * (128 + 16)}px)` // 128px width + 16px gap
-              }}
-            >
-              {galleryItems.map((item, index) => (
-                <Dialog key={item.id} open={selectedItemIndex === index} onOpenChange={(open) => {
+            <div className="flex justify-center gap-2 sm:gap-4 px-8 sm:px-12">
+              {visibleItems.map((item, visibleIndex) => {
+                const actualIndex = carouselIndex + visibleIndex;
+                return (
+                <Dialog key={item.id} open={selectedItemIndex === actualIndex} onOpenChange={(open) => {
                   if (open) {
-                    setSelectedItemIndex(index);
+                    setSelectedItemIndex(actualIndex);
                   } else {
                     setSelectedItemIndex(null);
                   }
                 }}>
                   <DialogTrigger asChild>
-                    <Card className="flex-shrink-0 w-32 h-32 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
+                    <Card className="flex-shrink-0 w-24 h-24 sm:w-32 sm:h-32 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
                       <CardContent className="p-0 h-full">
                         <div className="relative w-full h-full bg-black flex items-center justify-center">
                           {item.file_type === 'image' ? (
@@ -185,7 +186,7 @@ const GallerySection = () => {
                                 muted
                               />
                               <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                                <Play className="w-8 h-8 text-white" />
+                                <Play className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                               </div>
                             </div>
                           )}
@@ -248,8 +249,9 @@ const GallerySection = () => {
                       )}
                     </div>
                   </DialogContent>
-                </Dialog>
-              ))}
+                 </Dialog>
+                );
+              })}
             </div>
           </div>
         </div>
