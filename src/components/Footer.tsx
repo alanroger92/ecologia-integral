@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Leaf, Users, User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
@@ -85,7 +86,11 @@ export const Footer = () => {
 
         <div className="border-t border-primary-foreground/20 mt-8 pt-6 text-center">
           <p className="text-sm opacity-70">
-            © 2025 Escola SuperGeeks Canoas. Projeto desenvolvido com 💚 para um mundo mais sustentável.
+            © 2025 Escola SuperGeeks Canoas. Projeto desenvolvido com{" "}
+            <Link to="/admin" className="hover:scale-110 transition-transform inline-block cursor-pointer">
+              💚
+            </Link>{" "}
+            para um mundo mais sustentável.
           </p>
         </div>
       </div>
