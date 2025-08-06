@@ -22,6 +22,7 @@ const Gallery = () => {
 
   useEffect(() => {
     fetchGalleryItems();
+    window.scrollTo(0, 0);
   }, []);
 
   const fetchGalleryItems = async () => {
