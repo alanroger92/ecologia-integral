@@ -3,10 +3,29 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Star, Check, X, Loader2, Edit, Trash2, LogOut, Upload, Image, Video } from "lucide-react";
+import { Star, Check, X, Loader2, Edit, Trash2, LogOut, Upload, Image, Video, GripVertical } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import {
+  CSS,
+} from '@dnd-kit/utilities';
 
 interface Review {
   id: string;
@@ -26,6 +45,7 @@ interface GalleryItem {
   file_type: string;
   caption: string | null;
   created_at: string;
+  display_order: number;
 }
 
 const Admin = () => {
@@ -39,6 +59,14 @@ const Admin = () => {
   const [uploadCaption, setUploadCaption] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Sensores para drag and drop
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   useEffect(() => {
     // Verificar se está logado
@@ -82,7 +110,7 @@ const Admin = () => {
       const { data, error } = await supabase
         .from('gallery')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('display_order', { ascending: true });
 
       if (error) throw error;
       setGalleryItems(data || []);
@@ -139,6 +167,9 @@ const Admin = () => {
         .from('gallery')
         .getPublicUrl(filePath);
 
+      // Obter próximo número de ordem
+      const maxOrder = galleryItems.length > 0 ? Math.max(...galleryItems.map(item => item.display_order)) : -1;
+
       // Salvar na tabela gallery
       const fileType = file.type.startsWith('image/') ? 'image' : 'video';
       const { error: dbError } = await supabase
@@ -147,7 +178,8 @@ const Admin = () => {
           file_name: file.name,
           file_url: publicUrl,
           file_type: fileType,
-          caption: uploadCaption.trim() || null
+          caption: uploadCaption.trim() || null,
+          display_order: maxOrder + 1
         });
 
       if (dbError) throw dbError;
@@ -211,6 +243,54 @@ const Admin = () => {
       });
     } finally {
       setUpdating(null);
+    }
+  };
+
+  // Função para lidar com drag and drop
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const oldIndex = galleryItems.findIndex((item) => item.id === active.id);
+    const newIndex = galleryItems.findIndex((item) => item.id === over.id);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      // Reordenar array localmente
+      const newItems = arrayMove(galleryItems, oldIndex, newIndex);
+      setGalleryItems(newItems);
+
+      // Atualizar ordens no banco de dados
+      try {
+        const updates = newItems.map((item, index) => ({
+          id: item.id,
+          display_order: index
+        }));
+
+        // Atualizar cada item individualmente (supabase não suporta bulk update direto)
+        for (const update of updates) {
+          await supabase
+            .from('gallery')
+            .update({ display_order: update.display_order })
+            .eq('id', update.id);
+        }
+
+        toast({
+          title: "Sucesso",
+          description: "Ordem da galeria atualizada",
+        });
+      } catch (error) {
+        console.error('Error updating gallery order:', error);
+        toast({
+          title: "Erro",
+          description: "Erro ao atualizar ordem da galeria",
+          variant: "destructive",
+        });
+        // Reverter em caso de erro
+        fetchGalleryItems();
+      }
     }
   };
 
@@ -351,6 +431,100 @@ const Admin = () => {
     );
   }
 
+  // Componente para item arrastável da galeria
+  const SortableGalleryItem = ({ item }: { item: GalleryItem }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: item.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={`border rounded-lg p-4 bg-background ${isDragging ? 'shadow-lg' : ''}`}
+      >
+        <div className="flex items-center gap-4">
+          {/* Handle para arrastar */}
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <GripVertical className="w-5 h-5" />
+          </div>
+
+          {/* Miniatura */}
+          <div className="w-16 h-16 bg-black rounded-md overflow-hidden flex-shrink-0">
+            {item.file_type === 'image' ? (
+              <img
+                src={item.file_url}
+                alt={item.caption || item.file_name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full relative flex items-center justify-center">
+                <video
+                  src={item.file_url}
+                  className="w-full h-full object-cover"
+                />
+                <Video className="absolute w-6 h-6 text-white" />
+              </div>
+            )}
+          </div>
+
+          {/* Informações */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              {item.file_type === 'image' ? (
+                <Image className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <Video className="w-4 h-4 text-muted-foreground" />
+              )}
+              <span className="text-sm font-medium">
+                {item.file_type === 'image' ? 'Imagem' : 'Vídeo'}
+              </span>
+            </div>
+            
+            {item.caption && (
+              <p className="text-sm text-foreground mb-1 truncate">
+                {item.caption}
+              </p>
+            )}
+            
+            <p className="text-xs text-muted-foreground">
+              {formatDate(item.created_at)}
+            </p>
+          </div>
+
+          {/* Botão remover */}
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={() => deleteGalleryItem(item)}
+            disabled={updating === item.id}
+          >
+            {updating === item.id ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Trash2 className="w-4 h-4" />
+            )}
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
@@ -474,71 +648,32 @@ const Admin = () => {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {galleryItems.map((item) => (
-                <Card key={item.id} className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="aspect-video bg-black flex items-center justify-center relative">
-                      {item.file_type === 'image' ? (
-                        <img
-                          src={item.file_url}
-                          alt={item.caption || item.file_name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <>
-                          <video
-                            src={item.file_url}
-                            className="w-full h-full object-cover"
-                            controls={false}
-                          />
-                          <Video className="absolute w-8 h-8 text-white" />
-                        </>
-                      )}
+            <Card>
+              <CardHeader>
+                <CardTitle>Arraste para reordenar a galeria</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  A ordem aqui será a mesma exibida no site
+                </p>
+              </CardHeader>
+              <CardContent>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={galleryItems.map(item => item.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-3">
+                      {galleryItems.map((item) => (
+                        <SortableGalleryItem key={item.id} item={item} />
+                      ))}
                     </div>
-                    <div className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          {item.file_type === 'image' ? (
-                            <Image className="w-4 h-4 text-muted-foreground" />
-                          ) : (
-                            <Video className="w-4 h-4 text-muted-foreground" />
-                          )}
-                          <span className="text-sm font-medium">
-                            {item.file_type === 'image' ? 'Imagem' : 'Vídeo'}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {item.caption && (
-                        <p className="text-sm text-foreground mb-2">
-                          {item.caption}
-                        </p>
-                      )}
-                      
-                      <p className="text-xs text-muted-foreground mb-3">
-                        {formatDate(item.created_at)}
-                      </p>
-                      
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => deleteGalleryItem(item)}
-                        disabled={updating === item.id}
-                        className="w-full"
-                      >
-                        {updating === item.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-4 h-4" />
-                        )}
-                        Remover
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  </SortableContext>
+                </DndContext>
+              </CardContent>
+            </Card>
           )}
         </div>
 

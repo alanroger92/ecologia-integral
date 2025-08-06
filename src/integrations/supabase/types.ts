@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           caption: string | null
           created_at: string
+          display_order: number | null
           file_name: string
           file_type: string
           file_url: string
@@ -27,6 +28,7 @@ export type Database = {
         Insert: {
           caption?: string | null
           created_at?: string
+          display_order?: number | null
           file_name: string
           file_type: string
           file_url: string
@@ -36,6 +38,7 @@ export type Database = {
         Update: {
           caption?: string | null
           created_at?: string
+          display_order?: number | null
           file_name?: string
           file_type?: string
           file_url?: string
