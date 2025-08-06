@@ -187,7 +187,7 @@ const GallerySection = () => {
                   }
                 }}>
                   <DialogTrigger asChild>
-                    <Card className="flex-shrink-0 w-24 h-24 sm:w-32 sm:h-32 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
+                    <Card className="flex-shrink-0 w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
                       <CardContent className="p-0 h-full">
                         <div className="relative w-full h-full bg-black flex items-center justify-center">
                           {item.file_type === 'image' ? (
