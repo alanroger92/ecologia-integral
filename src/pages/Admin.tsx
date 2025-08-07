@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Star, Check, X, Loader2, Edit, Trash2, LogOut, Upload, Image, Video, GripVertical } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -592,354 +593,365 @@ const Admin = () => {
           </div>
         )}
 
-        {/* Gerenciamento da Galeria */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6 text-foreground">
-            Galeria do Projeto ({galleryItems.length})
-          </h2>
-          
-          {/* Upload de Nova Mídia */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Upload className="w-5 h-5" />
-                Adicionar Foto ou Vídeo
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Legenda (opcional)
-                </label>
-                <Input
-                  value={uploadCaption}
-                  onChange={(e) => setUploadCaption(e.target.value)}
-                  placeholder="Digite uma legenda para a mídia..."
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Arquivo
-                </label>
-                <Input
-                  type="file"
-                  accept="image/*,video/*"
-                  onChange={handleFileUpload}
-                  disabled={uploading}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Formatos suportados: JPG, PNG, WEBP, MP4, WEBM (máx. 50MB)
-                </p>
-              </div>
-              {uploading && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Enviando arquivo...
+        <Tabs defaultValue="gallery" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="gallery">Galeria</TabsTrigger>
+            <TabsTrigger value="reviews">Avaliações</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="gallery" className="mt-6">
+            {/* Gerenciamento da Galeria */}
+            <div>
+              <h2 className="text-2xl font-semibold mb-6 text-foreground">
+                Galeria do Projeto ({galleryItems.length})
+              </h2>
+              
+              {/* Upload de Nova Mídia */}
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Upload className="w-5 h-5" />
+                    Adicionar Foto ou Vídeo
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Legenda (opcional)
+                    </label>
+                    <Input
+                      value={uploadCaption}
+                      onChange={(e) => setUploadCaption(e.target.value)}
+                      placeholder="Digite uma legenda para a mídia..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Arquivo
+                    </label>
+                    <Input
+                      type="file"
+                      accept="image/*,video/*"
+                      onChange={handleFileUpload}
+                      disabled={uploading}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Formatos suportados: JPG, PNG, WEBP, MP4, WEBM (máx. 50MB)
+                    </p>
+                  </div>
+                  {uploading && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Enviando arquivo...
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Lista de Itens da Galeria */}
+              {galleryItems.length === 0 ? (
+                <Card>
+                  <CardContent className="p-6 text-center text-muted-foreground">
+                    Nenhuma foto ou vídeo na galeria ainda
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Arraste para reordenar a galeria</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      A ordem aqui será a mesma exibida no site
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext
+                        items={galleryItems.map(item => item.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <div className="space-y-3">
+                          {galleryItems.map((item) => (
+                            <SortableGalleryItem key={item.id} item={item} />
+                          ))}
+                        </div>
+                      </SortableContext>
+                    </DndContext>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="reviews" className="mt-6">
+            {/* Avaliações Pendentes */}
+            <div className="mb-12">
+              <h2 className="text-2xl font-semibold mb-6 text-foreground">
+                Avaliações Pendentes ({pendingReviews.length})
+              </h2>
+              
+              {pendingReviews.length === 0 ? (
+                <Card>
+                  <CardContent className="p-6 text-center text-muted-foreground">
+                    Nenhuma avaliação pendente
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {pendingReviews.map((review) => (
+                    <Card key={review.id} className="border-orange-200">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <CardTitle className="text-lg">{review.name}</CardTitle>
+                            <p className="text-sm text-muted-foreground">
+                              {review.age} anos
+                            </p>
+                          </div>
+                          {renderStars(review.rating)}
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-foreground mb-4">
+                          {review.comment}
+                        </p>
+                        <p className="text-xs text-muted-foreground mb-4">
+                          {formatDate(review.created_at)}
+                        </p>
+                        <div className="flex gap-2 mb-2">
+                          <Button
+                            size="sm"
+                            onClick={() => updateReviewStatus(review.id, true, false)}
+                            disabled={updating === review.id}
+                            className="flex-1"
+                          >
+                            {updating === review.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Check className="w-4 h-4" />
+                            )}
+                            Aprovar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => updateReviewStatus(review.id, false, true)}
+                            disabled={updating === review.id}
+                            className="flex-1"
+                          >
+                            {updating === review.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <X className="w-4 h-4" />
+                            )}
+                            Rejeitar
+                          </Button>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => startEditing(review)}
+                            className="flex-1"
+                          >
+                            <Edit className="w-4 h-4" />
+                            Editar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteReview(review.id)}
+                            disabled={updating === review.id}
+                            className="flex-1"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Apagar
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Lista de Itens da Galeria */}
-          {galleryItems.length === 0 ? (
-            <Card>
-              <CardContent className="p-6 text-center text-muted-foreground">
-                Nenhuma foto ou vídeo na galeria ainda
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>Arraste para reordenar a galeria</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  A ordem aqui será a mesma exibida no site
-                </p>
-              </CardHeader>
-              <CardContent>
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext
-                    items={galleryItems.map(item => item.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <div className="space-y-3">
-                      {galleryItems.map((item) => (
-                        <SortableGalleryItem key={item.id} item={item} />
-                      ))}
-                    </div>
-                  </SortableContext>
-                </DndContext>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Avaliações Pendentes */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6 text-foreground">
-            Avaliações Pendentes ({pendingReviews.length})
-          </h2>
-          
-          {pendingReviews.length === 0 ? (
-            <Card>
-              <CardContent className="p-6 text-center text-muted-foreground">
-                Nenhuma avaliação pendente
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {pendingReviews.map((review) => (
-                <Card key={review.id} className="border-orange-200">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{review.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">
-                          {review.age} anos
-                        </p>
-                      </div>
-                      {renderStars(review.rating)}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-foreground mb-4">
-                      {review.comment}
-                    </p>
-                    <p className="text-xs text-muted-foreground mb-4">
-                      {formatDate(review.created_at)}
-                    </p>
-                    <div className="flex gap-2 mb-2">
-                      <Button
-                        size="sm"
-                        onClick={() => updateReviewStatus(review.id, true, false)}
-                        disabled={updating === review.id}
-                        className="flex-1"
-                      >
-                        {updating === review.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Check className="w-4 h-4" />
-                        )}
-                        Aprovar
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => updateReviewStatus(review.id, false, true)}
-                        disabled={updating === review.id}
-                        className="flex-1"
-                      >
-                        {updating === review.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <X className="w-4 h-4" />
-                        )}
-                        Rejeitar
-                      </Button>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => startEditing(review)}
-                        className="flex-1"
-                      >
-                        <Edit className="w-4 h-4" />
-                        Editar
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => deleteReview(review.id)}
-                        disabled={updating === review.id}
-                        className="flex-1"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Apagar
-                      </Button>
-                    </div>
+            {/* Avaliações Aprovadas */}
+            <div className="mb-12">
+              <h2 className="text-2xl font-semibold mb-6 text-foreground">
+                Avaliações Aprovadas ({approvedReviews.length})
+              </h2>
+              
+              {approvedReviews.length === 0 ? (
+                <Card>
+                  <CardContent className="p-6 text-center text-muted-foreground">
+                    Nenhuma avaliação aprovada ainda
                   </CardContent>
                 </Card>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Avaliações Aprovadas */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6 text-foreground">
-            Avaliações Aprovadas ({approvedReviews.length})
-          </h2>
-          
-          {approvedReviews.length === 0 ? (
-            <Card>
-              <CardContent className="p-6 text-center text-muted-foreground">
-                Nenhuma avaliação aprovada ainda
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {approvedReviews.map((review) => (
-                <Card key={review.id} className="border-green-200">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{review.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">
-                          {review.age} anos
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {approvedReviews.map((review) => (
+                    <Card key={review.id} className="border-green-200">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <CardTitle className="text-lg">{review.name}</CardTitle>
+                            <p className="text-sm text-muted-foreground">
+                              {review.age} anos
+                            </p>
+                          </div>
+                          {renderStars(review.rating)}
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-foreground mb-4">
+                          {review.comment}
                         </p>
-                      </div>
-                      {renderStars(review.rating)}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-foreground mb-4">
-                      {review.comment}
-                    </p>
-                    <p className="text-xs text-muted-foreground mb-4">
-                      {formatDate(review.created_at)}
-                    </p>
-                    <div className="flex gap-2 mb-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => updateReviewStatus(review.id, false, false)}
-                        disabled={updating === review.id}
-                        className="flex-1"
-                      >
-                        {updating === review.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <X className="w-4 h-4" />
-                        )}
-                        Remover
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => updateReviewStatus(review.id, false, true)}
-                        disabled={updating === review.id}
-                        className="flex-1"
-                      >
-                        Rejeitar
-                      </Button>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => startEditing(review)}
-                        className="flex-1"
-                      >
-                        <Edit className="w-4 h-4" />
-                        Editar
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => deleteReview(review.id)}
-                        disabled={updating === review.id}
-                        className="flex-1"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Apagar
-                      </Button>
-                    </div>
+                        <p className="text-xs text-muted-foreground mb-4">
+                          {formatDate(review.created_at)}
+                        </p>
+                        <div className="flex gap-2 mb-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => updateReviewStatus(review.id, false, false)}
+                            disabled={updating === review.id}
+                            className="flex-1"
+                          >
+                            {updating === review.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <X className="w-4 h-4" />
+                            )}
+                            Remover
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => updateReviewStatus(review.id, false, true)}
+                            disabled={updating === review.id}
+                            className="flex-1"
+                          >
+                            Rejeitar
+                          </Button>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => startEditing(review)}
+                            className="flex-1"
+                          >
+                            <Edit className="w-4 h-4" />
+                            Editar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteReview(review.id)}
+                            disabled={updating === review.id}
+                            className="flex-1"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Apagar
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Avaliações Rejeitadas */}
+            <div>
+              <h2 className="text-2xl font-semibold mb-6 text-foreground">
+                Avaliações Rejeitadas ({rejectedReviews.length})
+              </h2>
+              
+              {rejectedReviews.length === 0 ? (
+                <Card>
+                  <CardContent className="p-6 text-center text-muted-foreground">
+                    Nenhuma avaliação rejeitada
                   </CardContent>
                 </Card>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Avaliações Rejeitadas */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-6 text-foreground">
-            Avaliações Rejeitadas ({rejectedReviews.length})
-          </h2>
-          
-          {rejectedReviews.length === 0 ? (
-            <Card>
-              <CardContent className="p-6 text-center text-muted-foreground">
-                Nenhuma avaliação rejeitada
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {rejectedReviews.map((review) => (
-                <Card key={review.id} className="border-red-200">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-lg">{review.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">
-                          {review.age} anos
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {rejectedReviews.map((review) => (
+                    <Card key={review.id} className="border-red-200">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <CardTitle className="text-lg">{review.name}</CardTitle>
+                            <p className="text-sm text-muted-foreground">
+                              {review.age} anos
+                            </p>
+                          </div>
+                          {renderStars(review.rating)}
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-foreground mb-4">
+                          {review.comment}
                         </p>
-                      </div>
-                      {renderStars(review.rating)}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-foreground mb-4">
-                      {review.comment}
-                    </p>
-                    <p className="text-xs text-muted-foreground mb-4">
-                      {formatDate(review.created_at)}
-                    </p>
-                    <div className="flex gap-2 mb-2">
-                      <Button
-                        size="sm"
-                        onClick={() => updateReviewStatus(review.id, true, false)}
-                        disabled={updating === review.id}
-                        className="flex-1"
-                      >
-                        {updating === review.id ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Check className="w-4 h-4" />
-                        )}
-                        Aprovar
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => updateReviewStatus(review.id, false, false)}
-                        disabled={updating === review.id}
-                        className="flex-1"
-                      >
-                        Remover
-                      </Button>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => startEditing(review)}
-                        className="flex-1"
-                      >
-                        <Edit className="w-4 h-4" />
-                        Editar
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => deleteReview(review.id)}
-                        disabled={updating === review.id}
-                        className="flex-1"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Apagar
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                        <p className="text-xs text-muted-foreground mb-4">
+                          {formatDate(review.created_at)}
+                        </p>
+                        <div className="flex gap-2 mb-2">
+                          <Button
+                            size="sm"
+                            onClick={() => updateReviewStatus(review.id, true, false)}
+                            disabled={updating === review.id}
+                            className="flex-1"
+                          >
+                            {updating === review.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Check className="w-4 h-4" />
+                            )}
+                            Aprovar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => updateReviewStatus(review.id, false, false)}
+                            disabled={updating === review.id}
+                            className="flex-1"
+                          >
+                            Remover
+                          </Button>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => startEditing(review)}
+                            className="flex-1"
+                          >
+                            <Edit className="w-4 h-4" />
+                            Editar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteReview(review.id)}
+                            disabled={updating === review.id}
+                            className="flex-1"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Apagar
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
