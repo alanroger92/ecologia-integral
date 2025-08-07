@@ -58,6 +58,8 @@ const Admin = () => {
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [editComment, setEditComment] = useState("");
   const [uploadCaption, setUploadCaption] = useState("");
+  const [editingCaption, setEditingCaption] = useState<GalleryItem | null>(null);
+  const [newCaption, setNewCaption] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -393,6 +395,45 @@ const Admin = () => {
     setEditComment(review.comment);
   };
 
+  const updateCaption = async () => {
+    if (!editingCaption) return;
+
+    setUpdating(editingCaption.id);
+    try {
+      const { error } = await supabase
+        .from('gallery')
+        .update({ caption: newCaption.trim() || null })
+        .eq('id', editingCaption.id);
+
+      if (error) throw error;
+
+      setGalleryItems(galleryItems.map(item => 
+        item.id === editingCaption.id ? { ...item, caption: newCaption.trim() || null } : item
+      ));
+
+      setEditingCaption(null);
+      setNewCaption("");
+      toast({
+        title: "Sucesso",
+        description: "Legenda atualizada com sucesso",
+      });
+    } catch (error) {
+      console.error('Error updating caption:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar a legenda",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdating(null);
+    }
+  };
+
+  const startEditingCaption = (item: GalleryItem) => {
+    setEditingCaption(item);
+    setNewCaption(item.caption || "");
+  };
+
   const renderStars = (rating: number) => {
     return (
       <div className="flex gap-1">
@@ -508,19 +549,30 @@ const Admin = () => {
             </p>
           </div>
 
-          {/* Botão remover */}
-          <Button
-            size="sm"
-            variant="destructive"
-            onClick={() => deleteGalleryItem(item)}
-            disabled={updating === item.id}
-          >
-            {updating === item.id ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Trash2 className="w-4 h-4" />
-            )}
-          </Button>
+          {/* Botões */}
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => startEditingCaption(item)}
+              title="Editar legenda"
+            >
+              <Edit className="w-4 h-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => deleteGalleryItem(item)}
+              disabled={updating === item.id}
+              title="Remover item"
+            >
+              {updating === item.id ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Trash2 className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -582,6 +634,74 @@ const Admin = () => {
                     onClick={() => {
                       setEditingReview(null);
                       setEditComment("");
+                    }}
+                    className="flex-1"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Modal de Edição de Legenda */}
+        {editingCaption && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-lg">
+              <CardHeader>
+                <CardTitle>Editar Legenda</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    {editingCaption.file_type === 'image' ? 'Imagem' : 'Vídeo'}
+                  </label>
+                  <div className="w-20 h-20 bg-black rounded-md overflow-hidden">
+                    {editingCaption.file_type === 'image' ? (
+                      <img
+                        src={editingCaption.file_url}
+                        alt={editingCaption.caption || editingCaption.file_name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full relative flex items-center justify-center">
+                        <video
+                          src={editingCaption.file_url}
+                          className="w-full h-full object-cover"
+                        />
+                        <Video className="absolute w-6 h-6 text-white" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Legenda</label>
+                  <Textarea
+                    value={newCaption}
+                    onChange={(e) => setNewCaption(e.target.value)}
+                    placeholder="Digite uma legenda para esta mídia..."
+                    rows={3}
+                    className="resize-none"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={updateCaption} 
+                    disabled={updating === editingCaption.id}
+                    className="flex-1"
+                  >
+                    {updating === editingCaption.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      "Salvar"
+                    )}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setEditingCaption(null);
+                      setNewCaption("");
                     }}
                     className="flex-1"
                   >
