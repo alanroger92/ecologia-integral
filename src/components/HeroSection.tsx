@@ -21,10 +21,6 @@ export const HeroSection = () => {
       
       {/* Content */}
       <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
-        <Badge className="mb-6 bg-accent text-accent-foreground border-0 text-lg px-6 py-2">
-          <Leaf className="w-5 h-5 mr-2" />
-          Ecologia Integral
-        </Badge>
         
         <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 leading-tight">
           FAÇA A <span className="text-accent">DIFERENÇA</span>
